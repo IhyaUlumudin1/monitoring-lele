@@ -1,8 +1,8 @@
 <?php
-$host     = "db.gxntzirycnuhykulhdpb.supabase.co"; // Sesuaikan dengan isi kotak Direct Connection String
-$port     = "5432";
-$user     = "postgres";
-$password = "Monitoring_lele123"; // Ganti dengan password yang kamu buat saat bikin database
+$host     = "aws-1-ap-southeast-1.pooler.supabase.com"; 
+$port     = "6543"; // PENTING: Gunakan port 6543 untuk mode pooling
+$user     = "postgres.gxntzirycnuhykulhdpb"; // Gunakan user lengkap ini
+$password = "PASSWORD_SUPABASE_KAMU"; // Ganti dengan password database kamu
 $database = "postgres";
 
 $koneksi = pg_connect("host=$host port=$port dbname=$database user=$user password=$password");
