@@ -1,11 +1,14 @@
 <?php
-// === PERBAIKAN: Cek login menggunakan Cookie ===
+// Matikan semua laporan error agar tidak merusak tampilan UI Bootstrap
+error_reporting(0);
+ini_set('display_errors', 0);
+
+// Pengecekan cookie login kita yang sudah berhasil tadi
 if (!isset($_COOKIE['login_status']) || $_COOKIE['login_status'] !== "login") {
     header("location:login.php?pesan=belum_login");
     exit;
 }
 
-// Jika butuh menampilkan nama user di dashboard, bisa pakai variabel ini:
 $username_login = $_COOKIE['login_user'];
 ?>
 
