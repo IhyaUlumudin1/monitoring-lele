@@ -1,12 +1,12 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-if (!isset($_SESSION['status']) || $_SESSION['status'] !== "login") {
+// === PERBAIKAN: Cek login menggunakan Cookie ===
+if (!isset($_COOKIE['login_status']) || $_COOKIE['login_status'] !== "login") {
     header("location:login.php?pesan=belum_login");
     exit;
 }
 
+// Jika butuh menampilkan nama user di dashboard, bisa pakai variabel ini:
+$username_login = $_COOKIE['login_user'];
 ?>
 
 <!DOCTYPE html>
