@@ -16,7 +16,7 @@ if (pg_num_rows($result) === 1) {
     $_SESSION['status']   = "login";
     $_SESSION['username'] = $username;
     
-    header("location:dashboard.php");
+    header("location:/");
     exit;
 } else {
     header("location:login.php?pesan=gagal");
