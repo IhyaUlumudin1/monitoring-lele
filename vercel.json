@@ -1,26 +1,16 @@
 {
-  "builds": [
-    {
-      "src": "api/**/*.php",
-      "use": "vercel-php@0.7.3"
+  "functions": {
+    "api/**/*.php": {
+      "runtime": "vercel-php@0.7.1"
     },
-    {
-      "src": "*.php",
-      "use": "vercel-php@0.7.3"
-    },
-    {
-      "src": "*.png",
-      "use": "@vercel/static"
+    "*.php": {
+      "runtime": "vercel-php@0.7.1"
     }
-  ],
+  },
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/proses-login.php", "dest": "/proses-login.php" },
+    { "src": "/login.php", "dest": "/login.php" },
+    { "src": "/(.*)", "dest": "/api/index.php" }
   ]
 }
