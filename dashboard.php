@@ -9,7 +9,8 @@ if (!isset($_COOKIE['login_status']) || $_COOKIE['login_status'] !== "login") {
     exit;
 }
 
-$username_login = $_COOKIE['login_user'];
+// Mengambil username dari cookie yang valid
+$username_login = isset($_COOKIE['login_user']) ? $_COOKIE['login_user'] : 'User';
 ?>
 
 <!DOCTYPE html>
@@ -28,7 +29,7 @@ $username_login = $_COOKIE['login_user'];
         <aside class="w-66 bg-white text-slate-800 flex flex-col justify-between p-5 hidden lg:flex border-r border-slate-200/60 shadow-xs">
             <div>
                 <div class="flex flex-col items-center text-center mb-8 px-2 border-b border-slate-100 pb-5">
-                    <img src="omega_logo.png" alt="Omega Logo" class="w-20 h-20 object-contain mb-3">
+                    <img src="Omega_logo_png.png" alt="Omega Logo" class="w-20 h-20 object-contain mb-3">
                     <h2 class="text-sm font-black tracking-tight text-slate-900 uppercase">Smart Aquaculture</h2>
                     <span class="text-[11px] text-slate-400 mt-1 block leading-tight">IoT Monitoring System</span>
                 </div>
@@ -48,11 +49,11 @@ $username_login = $_COOKIE['login_user'];
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/60">
                 <div class="flex items-center space-x-3 mb-3">
                     <div class="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 font-bold text-sm">
-                        <?php echo strtoupper(substr($_SESSION['username'], 0, 1)); ?>
+                        <?php echo strtoupper(substr($username_login, 0, 1)); ?>
                     </div>
                     <div>
                         <p class="text-xs text-slate-400">Masuk sebagai</p>
-                        <p class="text-sm font-semibold text-slate-800 truncate"><?php echo $_SESSION['username']; ?></p>
+                        <p class="text-sm font-semibold text-slate-800 truncate"><?php echo htmlspecialchars($username_login); ?></p>
                     </div>
                 </div>
                 <a href="logout.php" class="block w-full text-center bg-rose-50 hover:bg-rose-100 text-rose-600 py-2.5 rounded-xl font-medium transition text-sm border border-rose-200/40">
@@ -65,7 +66,7 @@ $username_login = $_COOKIE['login_user'];
             
             <header class="bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-slate-200/60 p-4 flex justify-between items-center lg:justify-end">
                 <div class="flex items-center space-x-2 lg:hidden">
-                    <img src="omega_logo.png" alt="Omega Logo" class="w-8 h-8 object-contain">
+                    <img src="Omega_logo_png.png" alt="Omega Logo" class="w-8 h-8 object-contain">
                     <h1 class="text-xs font-bold text-slate-900 uppercase">Smart Aquaculture</h1>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -127,7 +128,7 @@ $username_login = $_COOKIE['login_user'];
                             <p class="text-[11px] font-bold text-slate-400 tracking-wider uppercase">Kadar keasaman (pH)</p>
                             <div class="flex items-baseline mt-1">
                                 <span id="txt-ph" class="text-5xl font-black text-slate-900 tracking-tight">...</span>
-                                * <span class="text-2xl font-bold text-slate-400 ml-1">pH</span>
+                                <span class="text-2xl font-bold text-slate-400 ml-1">pH</span>
                             </div>
                         </div>
                     </div>
@@ -153,9 +154,7 @@ $username_login = $_COOKIE['login_user'];
 
     <script>
         const ctx = document.getElementById('realtimeChart').getContext('2d');
-        const maxPoints = 43200; // Tampung data streaming aman hingga durasi panjang 12 jam
-        
-        // Simpan referensi array mentah untuk jam, menit, detik internal
+        const maxPoints = 43200; 
         const rawTimeObjects = [];
 
         const realtimeChart = new Chart(ctx, {
@@ -177,7 +176,7 @@ $username_login = $_COOKIE['login_user'];
                     x: {
                         grid: { color: '#f1f5f9' },
                         ticks: {
-                            display: false, // Default awal disembunyikan (< 5 menit)
+                            display: false, 
                             font: { size: 10, weight: 'bold' },
                             color: '#64748b',
                             maxRotation: 0,
@@ -186,29 +185,11 @@ $username_login = $_COOKIE['login_user'];
                                 const totalData = realtimeChart.data.labels.length;
                                 const tObj = rawTimeObjects[index];
                                 if (!tObj) return '';
-
-                                const menitLalu = (totalData - index) / 60;
-
-                                // 1. Di bawah 5 Menit -> Sembunyikan total
                                 if (totalData < 300) return '';
-
-                                // 2. Antara 5 Menit s.d 30 Menit -> Tampilkan label per 1 menit
-                                if (totalData >= 300 && totalData < 1800) {
-                                    return tObj.detik === 0 ? `${tObj.jam}:${tObj.menit}` : '';
-                                }
-                                // 3. Antara 30 Menit s.d 1 Jam -> Tampilkan label per 5 menit
-                                if (totalData >= 1800 && totalData < 3600) {
-                                    return (tObj.menitAwal % 5 === 0 && tObj.detik === 0) ? `${tObj.jam}:${tObj.menit}` : '';
-                                }
-                                // 4. Antara 1 Jam s.d 4 Jam -> Tampilkan label per 30 menit
-                                if (totalData >= 3600 && totalData < 14400) {
-                                    return (tObj.menitAwal % 30 === 0 && tObj.detik === 0) ? `${tObj.jam}:${tObj.menit}` : '';
-                                }
-                                // 5. Antara 4 Jam s.d 12 Jam -> Tampilkan label per 1 Jam
-                                if (totalData >= 14400 && totalData < 43200) {
-                                    return (tObj.menitAwal === 0 && tObj.detik === 0) ? `${tObj.jam}:${tObj.menit}` : '';
-                                }
-                                // 6. Di atas 12 Jam -> Tampilkan label per 4 Jam
+                                if (totalData >= 300 && totalData < 1800) return tObj.detik === 0 ? `${tObj.jam}:${tObj.menit}` : '';
+                                if (totalData >= 1800 && totalData < 3600) return (tObj.menitAwal % 5 === 0 && tObj.detik === 0) ? `${tObj.jam}:${tObj.menit}` : '';
+                                if (totalData >= 3600 && totalData < 14400) return (tObj.menitAwal % 30 === 0 && tObj.detik === 0) ? `${tObj.jam}:${tObj.menit}` : '';
+                                if (totalData >= 14400 && totalData < 43200) return (tObj.menitAwal === 0 && tObj.detik === 0) ? `${tObj.jam}:${tObj.menit}` : '';
                                 return (tObj.jamAwal % 4 === 0 && tObj.menitAwal === 0 && tObj.detik === 0) ? `${tObj.jam}:${tObj.menit}` : '';
                             }
                         }
@@ -224,42 +205,29 @@ $username_login = $_COOKIE['login_user'];
                         padding: 12,
                         cornerRadius: 8,
                         callbacks: {
-                            title: function(context) {
-                                return 'Waktu Cek: ' + context[0].label + ' WIB';
-                            }
+                            title: function(context) { return 'Waktu Cek: ' + context[0].label + ' WIB'; }
                         }
                     }
                 }
             }
         });
 
-        // Manajemen update visual info skala teks pendukung di atas grafik
         function kelolaTeksSkala(totalPoints) {
             const txtInfo = document.getElementById('skala-info');
             const axisX = realtimeChart.options.scales.x.ticks;
-
-            if (totalPoints < 300) {
-                axisX.display = false; txtInfo.innerText = "Skala: Tersembunyi (<5m)";
-            } else if (totalPoints >= 300 && totalPoints < 1800) {
-                axisX.display = true; txtInfo.innerText = "Skala: per 1 Menit";
-            } else if (totalPoints >= 1800 && totalPoints < 3600) {
-                axisX.display = true; txtInfo.innerText = "Skala: per 5 Menit";
-            } else if (totalPoints >= 3600 && totalPoints < 14400) {
-                axisX.display = true; txtInfo.innerText = "Skala: per 30 Menit";
-            } else if (totalPoints >= 14400 && totalPoints < 43200) {
-                axisX.display = true; txtInfo.innerText = "Skala: per 1 Jam";
-            } else {
-                axisX.display = true; txtInfo.innerText = "Skala: per 4 Jam";
-            }
+            if (totalPoints < 300) { axisX.display = false; txtInfo.innerText = "Skala: Tersembunyi (<5m)"; } 
+            else if (totalPoints >= 300 && totalPoints < 1800) { axisX.display = true; txtInfo.innerText = "Skala: per 1 Menit"; } 
+            else if (totalPoints >= 1800 && totalPoints < 3600) { axisX.display = true; txtInfo.innerText = "Skala: per 5 Menit"; } 
+            else if (totalPoints >= 3600 && totalPoints < 14400) { axisX.display = true; txtInfo.innerText = "Skala: per 30 Menit"; } 
+            else if (totalPoints >= 14400 && totalPoints < 43200) { axisX.display = true; txtInfo.innerText = "Skala: per 1 Jam"; } 
+            else { axisX.display = true; txtInfo.innerText = "Skala: per 4 Jam"; }
         }
 
         async function perbaruiDashboard() {
             const statusKoneksi = document.getElementById('status-koneksi');
-            
             try {
                 const response = await fetch('api/ambil-blynk.php', { cache: "no-store" });
                 if (!response.ok) throw new Error("Offline");
-                
                 const data = await response.json();
 
                 statusKoneksi.className = "flex items-center space-x-2 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-full text-xs font-medium text-emerald-600 shadow-2xs";
@@ -273,7 +241,6 @@ $username_login = $_COOKIE['login_user'];
                 const nilaiKeruh = parseFloat(data.keruh);
                 const nilaiPh = parseFloat(data.ph);
 
-                // Logika Badge Status 
                 const bSuhu = document.getElementById('badge-suhu');
                 if (nilaiSuhu >= 25 && nilaiSuhu <= 30) { bSuhu.innerText = "Optimal"; bSuhu.className = "text-xs font-bold px-2.5 py-1 rounded-full text-emerald-700 bg-emerald-50 border border-emerald-100"; }
                 else if (nilaiSuhu > 30 && nilaiSuhu <= 32) { bSuhu.innerText = "Aman"; bSuhu.className = "text-xs font-bold px-2.5 py-1 rounded-full text-blue-700 bg-blue-50 border border-blue-100"; }
@@ -288,21 +255,17 @@ $username_login = $_COOKIE['login_user'];
                 else if (nilaiPh >= 6 && nilaiPh < 6.5) { bPh.innerText = "Aman"; bPh.className = "text-xs font-bold px-2.5 py-1 rounded-full text-blue-700 bg-blue-50 border border-blue-100"; }
                 else { bPh.innerText = "Bahaya"; bPh.className = "text-xs font-bold px-2.5 py-1 rounded-full text-rose-700 bg-rose-50 border border-rose-100 animate-pulse"; }
 
-                // Olah Waktu Jam Aktual
                 const sekarang = new Date();
                 const j = sekarang.getHours();
                 const m = sekarang.getMinutes();
                 const s = sekarang.getSeconds();
-                
                 const labelWaktuFull = String(j).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
                 
-                // Masukkan data baru ke chart
                 realtimeChart.data.labels.push(labelWaktuFull);
                 realtimeChart.data.datasets[0].data.push(nilaiSuhu);
                 realtimeChart.data.datasets[1].data.push(nilaiKeruh);
                 realtimeChart.data.datasets[2].data.push(nilaiPh);
 
-                // Masukkan meta object waktu internal untuk kalkulasi pembagian skala sumbu X
                 rawTimeObjects.push({
                     jam: String(j).padStart(2, '0'),
                     menit: String(m).padStart(2, '0'),
@@ -317,7 +280,6 @@ $username_login = $_COOKIE['login_user'];
                     rawTimeObjects.shift();
                 }
 
-                // Kalkulasi perubahan skala sumbu X dinamis
                 kelolaTeksSkala(realtimeChart.data.labels.length);
                 realtimeChart.update('none');
 
