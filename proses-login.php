@@ -16,10 +16,10 @@ if (pg_num_rows($result) === 1) {
     $_SESSION['status']   = "login";
     $_SESSION['username'] = $username;
     
-    header("location:/");
+    header("location:/"); // Mengarah ke halaman utama dashboard setelah sukses
     exit;
 } else {
-    header("location:login.php?pesan=gagal");
+    // Diubah agar mengarah langsung ke halaman login bawaan root Vercel dengan parameter pesan
+    header("location:/login.php?pesan=gagal");
     exit;
-}
-?>
+}?>
