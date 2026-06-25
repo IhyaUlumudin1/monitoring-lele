@@ -10,9 +10,9 @@ $password_md5 = md5($password);
 
 // Kita cari yang username DAN password-nya cocok di database
 $query  = "SELECT * FROM users WHERE username='$username' AND password='$password_md5'";
-$result = mysqli_query($koneksi, $query);
+$result = pg_query($koneksi, $query);
 
-if (mysqli_num_rows($result) === 1) {
+if (pg_num_rows($result) === 1) {
     $_SESSION['status']   = "login";
     $_SESSION['username'] = $username;
     
