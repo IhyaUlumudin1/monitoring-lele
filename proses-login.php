@@ -5,21 +5,21 @@ include 'koneksi.php';
 $username = pg_escape_string($koneksi, $_POST['username']);
 $password = pg_escape_string($koneksi, $_POST['password']);
 
-// Kita enkripsi password inputan user dengan MD5
-$password_md5 = md5($password);
-
-// Kita cari yang username DAN password-nya cocok di database
-$query  = "SELECT * FROM users WHERE username='$username' AND password='$password_md5'";
+// === PERBAIKAN: Enkripsi MD5 Dihapus ===
+// Kita langsung gunakan variabel $password teks biasa untuk dicocokkan ke database
+$query  = "SELECT * FROM users WHERE username='$username' AND password='$password'";
 $result = pg_query($koneksi, $query);
 
 if (pg_num_rows($result) === 1) {
     $_SESSION['status']   = "login";
     $_SESSION['username'] = $username;
     
-    header("location:/"); // Mengarah ke halaman utama dashboard setelah sukses
+    // Diarahkan ke dashboard.php sesuai struktur vercel.json aslimu
+    header("location:dashboard.php"); 
     exit;
 } else {
-    // Diubah agar mengarah langsung ke halaman login bawaan root Vercel dengan parameter pesan
-    header("location:/login.php?pesan=gagal");
+    // Diarahkan kembali ke login.php jika gagal
+    header("location:login.php?pesan=gagal");
     exit;
-}?>
+}
+?>
