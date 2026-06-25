@@ -2,8 +2,8 @@
 session_start();
 include 'koneksi.php';
 
-$username = mysqli_real_escape_string($koneksi, $_POST['username']);
-$password = $_POST['password'];
+$username = pg_escape_string($koneksi, $_POST['username']);
+$password = pg_escape_string($koneksi, $_POST['password']);
 
 // Kita enkripsi password inputan user dengan MD5
 $password_md5 = md5($password);
